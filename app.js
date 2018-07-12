@@ -16,7 +16,7 @@ app.set('views','./views')
 app.engine('html',ejs.__express)
 app.set('view engine','html')
 app.locals.moment = require('moment')
-app.use(express.static(path.join(__dirname,'bower_components')))
+app.use(express.static(path.join(__dirname,'public')))
 app.listen(port)
 
 console.log('node started on port '+port)
@@ -191,4 +191,18 @@ app.get('/admin/list',function(req,res){
  //        }
  //        ]
 	// })
+})
+
+// list delete movie
+app.delete('/admin/list',function(req,res){
+    var id = req.query.id
+    if(id){
+        Movie.remove({_id:id}, function(err,movie){
+            if(err){
+                console.log(err)
+            }else{
+                res.json({success:1})
+            }
+        })
+    }
 })
