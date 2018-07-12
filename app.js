@@ -4,6 +4,7 @@ var port = process.env.port || 3000
 var path = require('path')
 var mongoose = require('mongoose')
 var Movie = require('./models/movie.js')
+var User = require('./models/user.js')
 var _ = require('underscore')
 var ejs = require('ejs')
 
@@ -205,4 +206,66 @@ app.delete('/admin/list',function(req,res){
             }
         })
     }
+})
+
+// user signup
+app.post('/user/signup',function(req,res){
+    var _user = req.body.user    // req.param('user')
+   
+    User.find({name:_user.name}, function(err,user){
+        if(err){
+            console.log(err)
+        }
+        if(user){
+            res.redirect('/')
+        }else{
+            var user = new User(_user)
+            user.save(function(err,user){
+                if(err){
+                    console.log(err)
+                }
+                res.redirect('/admin/userlist')
+            })
+        }
+    })
+})
+
+app.get('/admin/userlist',function(req,res){
+     User.fetch(function(err,users){
+        if(err){
+            console.log(err)
+        }
+
+        res.render('userlist',{
+            title:'Node User List',
+            users: users
+        })
+    })
+})
+
+// signin
+app.post('/user/signin',function(req,res){
+    var _user = req.body.user
+    var name = _user.name
+    var password = _user.password
+
+    User.findOne({name:name},function(err,user){
+        if(err){
+            console.log(err)
+        }
+        if(!user){
+            return res.redirect('/')
+        }
+        user.comparePassword(password,function(err,isMatch){
+            if(err){
+                console.log(err)
+            }
+            if(isMatch){
+                console.log('Password is matched')
+                return res.redirect('/')
+            }else{
+                console.log('Password is not matched')
+            }
+        })
+    })
 })
