@@ -1,12 +1,31 @@
 var Movie = require('../models/movie.js')
+var Comment = require('../models/comment.js')
+var Category = require('../models/category.js')
 var _ = require('underscore')
 
 exports.detail = function(req,res){
     var id = req.params.id
     Movie.findById(id,function(err,movie){
-        res.render('detail',{
-            title:'Node Detail' + movie.title,
-            movie: movie
+        Comment.find({movie:id})
+        .populate('from','name')
+        .populate('reply.from reply.to','name')
+        .exec(function(err,comments){
+            if(req.session.user === undefined){
+                res.render('detail',{
+                    title:'Node Detail' + movie.title,
+                    movie: movie,
+                    user: '',
+                    comments: comments
+                })
+            }else{
+                res.render('detail',{
+                    title:'Node Detail' + movie.title,
+                    movie: movie,
+                    user: req.session.user,
+                    comments: comments
+                })
+            }
+            
         })
     })
     // res.render('detail',{
@@ -25,18 +44,12 @@ exports.detail = function(req,res){
 }
 
 exports.new = function(req,res){
-    res.render('admin',{
-        title:'Node Admin',
-        movie:{
-            title: '',
-            director: '',
-            country: '',
-            year: '',
-            language: '',
-            poster: '',
-            flash: '',
-            summary: ''
-        }
+    Category.find({},function(err,categories){
+        res.render('admin',{
+            title:'Node Admin',
+            categories: categories,
+            movie:{}
+        })
     })
 }
 
@@ -45,17 +58,21 @@ exports.update = function(req,res){
     var id = req.params.id
     if(id){
         Movie.findById(id,function(err,movie){
-            res.render('admin',{
-                title: 'Admin Update',
-                movie: movie
+            Category.find({},function(err,categories){
+                 res.render('admin',{
+                    title: 'Admin Update',
+                    movie: movie,
+                    categories: categories
+                })
             })
+           
         })
     }
 }
 
 // admin post movie
 exports.save = function(req,res){
-    console.log(req.body)
+    // console.log(req.body)
     var id = req.body.movie._id
     var movieObj = req.body.movie
     var _movie = null
@@ -84,11 +101,21 @@ exports.save = function(req,res){
             summary: movieObj.summary,
             flash: movieObj.flash
         })
-         _movie.save(function(err,movie){
+        var categoryId = movieObj.category
+
+        _movie.save(function(err,movie){
                 if(err){
                     console.log(err)
                 }
-                res.redirect('/movie/'+movie._id)
+                console.log(movie+'fowehfoe')
+    
+                Category.findById(categoryId,function(err,category){
+                    category.movies.push(movie._id)
+                    category.save(function(err,category){
+                        res.redirect('/movie/'+movie._id)
+                    })
+                })
+                
             })
     }
 }

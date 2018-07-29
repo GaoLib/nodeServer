@@ -1,0 +1,43 @@
+<!DOCTYPE>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="/libs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="page-header">
+                <h1><%= title %></h1>
+                <small>重度科幻迷</small>
+            </div>
+    <div class="container">
+        <div class="row">
+        <div class="col-md-5">        
+              <form method="post" action="/user/signup">
+                    <div class="modal-header">注册</div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="signupName">用户名</label>
+                            <input id="signupName" class="form-control" name="user[name]" type="text">
+                            <label for="signupPassword">密码</label>
+                            <input id="signupPassword" class="form-control" name="user[password]" type="text">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button class="btn btn-success" type="submit">提交</button>
+                    </div>
+                </form>
+              </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+<!-- <script src="/jquery/dist/jquery.min.js" type="text/javascript"></script> -->
+<script src="/libs/bootstrap/assets/js/vendor/jquery-slim.min.js" type="text/javascript"></script>
+<script src="/libs/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+<script>
+</script>
+</html>
