@@ -10,6 +10,7 @@ exports.index = function(req,res){
             if(err){
                 console.log(err)
             }
+            console.log(categories)
             if(req.session.user === undefined){
                 res.render('index',{
                     title:'Node Home',
