@@ -30,37 +30,60 @@ exports.index = function(req,res){
 
 exports.search = function(req,res){
     var catId = req.query.cat
-    var page = parseInt(req.query.p,10) 
+    var q = req.query.q
+    var page = parseInt(req.query.p,10) || 0
     var count = 2
     var index = page * count
 
-    Category
-    .find({_id:catId})
-    .populate({path:'movies'})
-    .exec(function(err,categories){
-            if(err){
-                console.log(err)
-            }
+    if(catId){
+        Category
+        .find({_id:catId})
+        .populate({path:'movies'})
+        .exec(function(err,categories){
+                if(err){
+                    console.log(err)
+                }
 
-            var category = categories[0] || {}
-            var movies = category.movies || []
-            var results = movies.slice(index,index + count)
-            var page = {
-                curPage: page + 1,
-                totalPage: Math.ceil(movies.length / count)
-            }
-            var category ={
-                name:  category.name,
-                id: category._id
-            }
+                var category = categories[0] || {}
+                var movies = category.movies || []
+                var results = movies.slice(index,index + count)
+                var page = {
+                    curPage: page + 1,
+                    totalPage: Math.ceil(movies.length / count)
+                }
+                var category ={
+                    name:  category.name,
+                    id: category._id
+                }
 
-            res.render('results',{
-                title:'Node Result',
-                keyword: category,
-                page: page,
-                results: results
+                res.render('results',{
+                    title:'Node Result',
+                    keyword: category,
+                    page: page,
+                    results: results
+                })
             })
-           
-           
+    }else{
+        Movie
+        .find({title : new RegExp(q+'.*','i')})
+        .exec(function(err,movies){
+            if(err){
+                    console.log(err)
+                }
+
+                var results = movies.slice(index,index + count)
+                var page = {
+                    curPage: page + 1,
+                    totalPage: Math.ceil(movies.length / count)
+                }
+
+                res.render('results',{
+                    title:'Node Result',
+                    keyword: q,
+                    page: page,
+                    results: results
+                })
         })
+    }
+   
 }
